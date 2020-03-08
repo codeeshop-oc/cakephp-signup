@@ -55,10 +55,17 @@ class SignupController extends AppController
         if ($this->request->is('post')) {
 
             $user = $this->Users->newEntity($this->request->getData());
-            // print_r($this->request->getData());die;
+
+            $usersTable = TableRegistry::getTableLocator()->get('Users');
+
             if(empty($user->getErrors())) {
-                $user->password = User::setPasswordhash($user->password);
-                if ($this->Users->save($user)) {
+                $conditions = array(
+                    'Users.phone_no' => $user->phone_no,                
+                );
+                
+                if($usersTable->exists($conditions)) {
+                    $this->Flash->error(__('User already exists with current phone number.'));
+                } elseif ($this->Users->save($user)) {
                     $this->Flash->success(__('Successfully Registered.'));  
                     return $this->redirect(['controller' => 'Users', 'action' => 'login']);
                 }

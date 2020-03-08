@@ -64,7 +64,10 @@ class UsersTable extends Table
                     'message' => 'Password need to be at least 4 characters long',
                 ]
             ]);
-    
+
+        $validator
+            ->sameAs('confirm', 'password', 'Password Mismatch');            
+            
         return $validator;       
     }
 }   
