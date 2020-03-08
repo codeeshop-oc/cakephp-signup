@@ -22,6 +22,8 @@ use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 use Cake\View\Exception\MissingTemplateException;
 use Cake\ORM\TableRegistry;
+use Cake\Utility\Hash;
+use App\Model\Entity\User;
 
 class SignupController extends AppController
 {
@@ -32,33 +34,55 @@ class SignupController extends AppController
         $this->loadComponent('Flash'); // Include the FlashComponent
     }
 
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        // Configure the login action to not require authentication, preventing
+        // the infinite redirect loop issue
+        $this->Authentication->addUnauthenticatedActions(['add']);
+
+        $result = $this->Authentication->getResult();
+        
+        if ($result->isValid()) {            
+            return $this->redirect(['controller' => 'Users', 'action' => 'dashboard']);
+        }
+    }
+
     public function add() {
 
         $this->loadModel('Users');
-        
-        $user = $this->Users->newEmptyEntity();
 
-        if ($this->request->is('post')) {			    
-            
-            $user = $this->Users->patchEntity($user, $this->request->getData());
+        if ($this->request->is('post')) {
 
-            if ($this->Users->save($user)) {
-                $this->Flash->success(__('The user has been saved.'));
-                return $this->redirect(['action' => 'login']);
-			}
-            $this->Flash->error(__('Unable to add the user.'));
+            $user = $this->Users->newEntity($this->request->getData());
+            // print_r($this->request->getData());die;
+            if(empty($user->getErrors())) {
+                $user->password = User::setPasswordhash($user->password);
+                if ($this->Users->save($user)) {
+                    $this->Flash->success(__('Successfully Registered.'));  
+                    return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+                }
+            } else {
+                // foreach ($user->getErrors() as $key => $error) {
+                //     foreach ($error as $err) {
+                //         $this->Flash->error(__($key . ' : ' . $err));                        
+                //         break;
+                //     }
+                // }     
+                $this->Flash->error(__('Please enter all fields correctly'));                        
+            }
         }
 
         $this->set('user', $user);
     }
 
-        public function display(): ?Response
+    public function display(): ?Response
     {
         $usersTable = TableRegistry::getTableLocator()->get('User');
         
         $user = $usersTable->newEmptyEntity();
 
-		$this->set('users', $user);
+        $this->set('users', $user);
 
         return $this->render('index');
     }

@@ -45,11 +45,11 @@ $this->disableAutoLayout();
 </head>
 <body>
     <main class="main">
-	    <?= $this->Form->create($users, [ 'controller' => 'Signup', 'action' => 'signup/add', 'validate' => true ]); ?>
+	    <?= $this->Form->create($users, [ 'controller' => 'Signup', 'action' => 'signup/add']); ?>
 	    <div class="container register-form">
 	        <div class="form">
 	            <div class="note">
-	                <h1>Signup</h1>
+	                <h1 class="lhunset">Signup</h1>
 	            </div>
 	            <div class="form-content">
 	                <div class="row">	                	

@@ -28,3 +28,12 @@
     background: #0062cc;
     color: #fff;
 }
+.margintop5 {
+    margin-top: 5px;
+}
+.has-error input {
+    border: 1px solid red;
+}
+.lhunset {
+    line-height: unset;
+}
